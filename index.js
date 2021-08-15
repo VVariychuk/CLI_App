@@ -1,5 +1,7 @@
 const { Command } = require('commander');
 
+const contacts = require("./contacts");
+
 const program = new Command();
 program
   .option('-a, --action <type>', 'choose action')
@@ -11,9 +13,6 @@ program
 program.parse(process.argv);
 
 const argv = program.opts();
-
-const contacts = require("./contacts");
-
 
 function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
