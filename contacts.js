@@ -18,7 +18,10 @@ async function getContactById(contactId) {
     try {
         const data = await fs.readFile(contactsPath);
         const contacts = JSON.parse(data);
-        const contact = contacts.find(el => el.id === +contactId);        
+        const contact = contacts.find(el => el.id === +contactId); 
+        if (!contact)  {
+            return 'Sorry, we have no this contact'
+        };
         return contact;
     } catch (error) {
         console.log(error.message);
@@ -32,22 +35,24 @@ async function removeContact(contactId) {
         
     if (!~contactIndex) {
       throw new Error(`Contact with id=${contactId} not found`);
-        };
+    };
 
     const removedContact = await contactsList.splice(contactIndex, 1);
     await fs.writeFile(contactsPath, JSON.stringify(contactsList));
 
     return removedContact;
     } catch (error) {
-        console.log(error.message);
+        throw error.message;
     }
 };
+
+const uniqId = (contacts) => contacts.reduce((acc, el) => acc < el.id? el.id: acc, 0)+1;
 
 async function addContact(name, email, phone) {
     try {
         const data = await fs.readFile(contactsPath);
         const contacts = JSON.parse(data);
-        const newContact = { id: shortid.generate(), name, email, phone };
+        const newContact = { id: uniqId(contacts), name, email, phone };
         const updatedContacts = [...contacts, newContact];
         await contacts.push(newContact);
         console.table(updatedContacts);
